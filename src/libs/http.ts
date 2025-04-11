@@ -24,7 +24,7 @@ const defaultConfig: AxiosRequestConfig = {
     'Content-Type': 'application/json',
     'X-Requested-With': 'XMLHttpRequest',
   },
-  baseURL: import.meta.env.VUE_APP_API_URL + '/api/v1',
+  baseURL: import.meta.env.VITE_API_URL + '/api',
   paramsSerializer: {
     serialize: stringify.stringify as unknown as CustomParamsSerializer,
   },
@@ -35,7 +35,7 @@ class HttpClient {
   private static requests: RequestCallback[] = []
   private static isRefreshing = false
   private static axiosInstance: AxiosInstance = axios.create(defaultConfig)
-  private static readonly whiteList: string[] = ['/sign-in', '/sign-out']
+  private static readonly whiteList: string[] = ['/login', '/logout']
 
   constructor() {
     this.httpInterceptorsRequest()

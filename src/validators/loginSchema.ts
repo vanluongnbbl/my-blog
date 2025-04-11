@@ -5,3 +5,5 @@ export const loginSchema = yup.object({
   email: email(),
   password: password(),
 })
+
+export type LoginDTO = yup.InferType<typeof loginSchema>
