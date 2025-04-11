@@ -7,13 +7,13 @@ import { useAuthStore } from '@/stores/useAuthStore'
 import { API_STATUS, LOGOUT_MESSAGE_CODE, PATHS } from '@/utils/constants'
 import { localStorageServices } from '@/utils/localStorageServices'
 
-const alertStore = useAlertStore()
-const authStore = useAuthStore()
-
 interface HttpClientRequestConfig extends AxiosRequestConfig {
   url: string
 }
-
+interface RefreshTokenResponse {
+  access_token: string
+  refresh_token: string
+}
 type RequestMethods = Extract<Method, 'get' | 'post' | 'put' | 'delete' | 'patch' | 'option' | 'head'>
 type RequestCallback = (token: string) => void
 
@@ -57,11 +57,13 @@ class HttpClient {
 
   private getNewToken = () => {
     const refresh_token = localStorageServices.getRefreshToken()
-    return HttpClient.axiosInstance.post(`/auth/refresh-token`, { refreshToken: refresh_token }).then((data) => {
-      localStorageServices.setAccessToken(data.data.token)
-      localStorageServices.setRefreshToken(data.data.refreshToken)
-      return { access_token: data.data.token, refresh_token: data.data.refreshToken }
-    })
+    return HttpClient.axiosInstance
+      .post(`/refresh-token`, { refreshToken: refresh_token })
+      .then((data): RefreshTokenResponse => {
+        localStorageServices.setAccessToken(data.access_token)
+        localStorageServices.setRefreshToken(data.refresh_token)
+        return { access_token: data.access_token, refresh_token: data.refresh_token }
+      })
   }
 
   private httpInterceptorsResponse(): void {
@@ -69,14 +71,28 @@ class HttpClient {
       (response) => response.data,
       async (error) => {
         const { config } = error
+        const alertStore = useAlertStore()
+        const authStore = useAuthStore()
 
         if (error?.response?.status === API_STATUS.UNAUTHORIZED) {
           if (!HttpClient.whiteList.some((v) => (config?.url as string).includes(v))) {
             if (!HttpClient.isRefreshing) {
               HttpClient.isRefreshing = true
               try {
-                const data = await this.getNewToken()
-                this.onRefreshed(data.access_token)
+                this.getNewToken()
+                  .then((data) => {
+                    this.onRefreshed(data.access_token)
+                  })
+                  .catch((error) => {
+                    HttpClient.requests = []
+                    if (!window.location.pathname.includes(PATHS.LOGIN)) {
+                      authStore.clearAuth()
+                    }
+                    return Promise.reject(error)
+                  })
+                  .finally(() => {
+                    HttpClient.isRefreshing = false
+                  })
               } catch (err) {
                 HttpClient.requests = []
                 if (!window.location.pathname.includes(PATHS.LOGIN)) {
