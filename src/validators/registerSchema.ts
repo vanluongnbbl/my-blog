@@ -3,8 +3,10 @@ import * as yup from 'yup'
 import { email, password, confirmPassword, required } from './rules'
 
 export const registerSchema = yup.object({
-  name: required('Name is required'),
+  userName: required('User name is required'),
   email: email(),
-  password: password(8), // custom min length
+  password: password(6),
   confirmPassword: confirmPassword('password'),
 })
+
+export type RegisterDTO = yup.InferType<typeof registerSchema>

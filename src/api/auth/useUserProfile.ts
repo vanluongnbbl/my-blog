@@ -23,6 +23,6 @@ export const USER_PROFILE_KEY = 'USER_PROFILE_KEY'
 export const useUserProfile = ({ config }: UseCustomerOptions = {}) =>
   useQuery<ExtractFnReturnType<QueryFnType>>({
     queryKey: [USER_PROFILE_KEY],
-    queryFn: () => getUserProfile(),
+    queryFn: getUserProfile,
     ...config,
   })

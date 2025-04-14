@@ -21,6 +21,7 @@ const { t } = useI18n()
 const { handleSubmit } = useForm<LoginDTO>({
   validationSchema: loginSchema,
 })
+
 const loginApi = useLogin({
   config: {
     onError: (error) => {
@@ -35,13 +36,14 @@ const loginApi = useLogin({
       localStorageServices.setAccessToken(data.data?.accessToken ?? '')
       localStorageServices.setRefreshToken(data.data?.refreshToken ?? '')
       queryClient.removeQueries()
+      userProfile.refetch()
     },
   },
 })
 
 const userProfile = useUserProfile({
   config: {
-    enabled: loginApi.isSuccess,
+    enabled: false,
   },
 })
 
@@ -70,11 +72,12 @@ const isLoading = computed(() => loginApi.isPending.value)
   <div class="flex flex-wrap gap-4 justify-center items-center h-screen">
     <el-card style="width: 480px" shadow="always">
       <el-form @submit.prevent="onSubmit">
-        <VTextField name="email" :label="t('login.email')" />
-        <VTextField name="password" :label="t('login.password')" type="password" />
+        <VTextField name="email" :label="t('auth.email')" />
+        <VTextField name="password" :label="t('auth.password')" type="password" />
+        <el-link type="primary" @click="router.push(PATHS.REGISTER)">{{ t('auth.signUp') }}</el-link>
         <div class="flex justify-end">
           <el-button type="primary" native-type="submit" size="large" :loading="isLoading" :disabled="isLoading">{{
-            t('login.login')
+            t('auth.login')
           }}</el-button>
         </div>
       </el-form>

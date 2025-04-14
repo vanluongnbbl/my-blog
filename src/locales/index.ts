@@ -1,11 +1,13 @@
 import homeEn from '@/locales/home/en'
 import homeVi from '@/locales/home/vi'
-import loginEn from '@/locales/login/en'
+import loginEn from '@/locales/auth/en'
+import messageEn from '@/locales/message/en'
 
 export default {
   en: {
     home: homeEn,
-    login: loginEn,
+    auth: loginEn,
+    message: messageEn,
   },
   vi: {
     home: homeVi,

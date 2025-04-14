@@ -13,4 +13,7 @@ export const LOGOUT_MESSAGE_CODE = ['WEB_E_MSG_007', 'WEB_E_MSG_PASSWORD_CHANGED
 export const PATHS = {
   HOME: '/',
   LOGIN: '/login',
+  REGISTER: '/register',
 }
+
+export const GUEST_ROUTES = ['login', 'register']

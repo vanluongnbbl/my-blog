@@ -56,13 +56,18 @@ class HttpClient {
   }
 
   private getNewToken = () => {
-    const refresh_token = localStorageServices.getRefreshToken()
+    const refresh_token = localStorageServices.getRefreshToken() || 'invalid-token'
     return HttpClient.axiosInstance
       .post(`/refresh-token`, { refreshToken: refresh_token })
-      .then((data): RefreshTokenResponse => {
+      .then((response) => {
+        const data = response.data
+
         localStorageServices.setAccessToken(data.access_token)
         localStorageServices.setRefreshToken(data.refresh_token)
         return { access_token: data.access_token, refresh_token: data.refresh_token }
+      })
+      .catch((error) => {
+        return Promise.reject(error)
       })
   }
 
@@ -78,30 +83,20 @@ class HttpClient {
           if (!HttpClient.whiteList.some((v) => (config?.url as string).includes(v))) {
             if (!HttpClient.isRefreshing) {
               HttpClient.isRefreshing = true
-              try {
-                this.getNewToken()
-                  .then((data) => {
-                    this.onRefreshed(data.access_token)
-                  })
-                  .catch((error) => {
-                    HttpClient.requests = []
-                    if (!window.location.pathname.includes(PATHS.LOGIN)) {
-                      authStore.clearAuth()
-                    }
-                    return Promise.reject(error)
-                  })
-                  .finally(() => {
-                    HttpClient.isRefreshing = false
-                  })
-              } catch (err) {
-                HttpClient.requests = []
-                if (!window.location.pathname.includes(PATHS.LOGIN)) {
-                  authStore.clearAuth()
-                }
-                return Promise.reject(err)
-              } finally {
-                HttpClient.isRefreshing = false
-              }
+              this.getNewToken()
+                .then((data) => {
+                  this.onRefreshed(data.access_token)
+                })
+                .catch((error) => {
+                  HttpClient.requests = []
+                  if (!window.location.pathname.includes(PATHS.LOGIN)) {
+                    authStore.clearAuth()
+                  }
+                  return Promise.reject(error)
+                })
+                .finally(() => {
+                  HttpClient.isRefreshing = false
+                })
             }
 
             return new Promise((resolve) => {
@@ -121,6 +116,8 @@ class HttpClient {
           authStore.clearAuth()
           throw Error('user inactive')
         }
+
+        console.log('error 333', error)
 
         return Promise.reject(error)
       },
