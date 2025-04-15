@@ -3,8 +3,8 @@ import { i18n } from '@/plugins/i18n'
 
 const t = i18n.global.t
 
-export const required = (message = t('message.error.fieldRequired')) => yup.string().trim().required(message)
-
+export const requiredWithLength = ({ message = t('message.error.fieldRequired'), minLength = 1, maxLength = 10 }) =>
+  yup.string().trim().min(minLength, message).max(maxLength, `Max length is ${maxLength} character.`).required(message)
 export const email = (message = 'Invalid email') => yup.string().trim().email(message).required('Email is required')
 
 export const minLength = (min: number, message?: string) =>

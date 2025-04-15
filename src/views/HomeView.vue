@@ -1,5 +1,7 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import CreatePost from '@/components/posts/CreatePost.vue'
+</script>
 
 <template>
-  <h1>hehe</h1>
+  <CreatePost />
 </template>

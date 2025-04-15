@@ -1,14 +1,22 @@
 <script setup lang="ts">
 import { Field } from 'vee-validate'
 
-defineProps<{
-  name: string
-  label?: string
-  placeholder?: string
-  type?: string
-  clearable?: boolean
-  disabled?: boolean
-}>()
+withDefaults(
+  defineProps<{
+    name: string
+    label?: string
+    placeholder?: string
+    type?: string
+    clearable?: boolean
+    disabled?: boolean
+    minRows?: number
+    maxRows?: number
+  }>(),
+  {
+    minRows: 2,
+    maxRows: 4,
+  },
+)
 </script>
 
 <template>
@@ -24,6 +32,7 @@ defineProps<{
           :disabled="disabled"
           :status="!meta.valid && meta.touched ? 'error' : ''"
           size="large"
+          :autosize="{ minRows, maxRows }"
           :model-value="field.value"
           @input="(val: string) => (field.value = val)"
           v-bind="field"

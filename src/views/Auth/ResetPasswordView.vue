@@ -4,17 +4,19 @@ import VTextField from '@/components/common/VTextField.vue'
 import { useI18n } from 'vue-i18n'
 import { API_STATUS, PATHS } from '@/utils/constants'
 import { useAlertStore } from '@/stores/useAlertStore'
-import { computed } from 'vue'
+import { computed, onBeforeMount, ref } from 'vue'
 import { changePasswordSchema, type ChangePasswordDTO } from '@/validators/changePasswordSchema'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useResetPassword } from '@/api/auth/useResetPassword'
 
 const router = useRouter()
+const route = useRoute()
 const alertStore = useAlertStore()
 const { t } = useI18n()
 const { handleSubmit } = useForm<ChangePasswordDTO>({
   validationSchema: changePasswordSchema,
 })
+const token = ref()
 
 const changePasswordApi = useResetPassword({
   config: {
@@ -34,6 +36,10 @@ const changePasswordApi = useResetPassword({
       router.push(PATHS.LOGIN)
     },
   },
+})
+
+onBeforeMount(() => {
+  token.value = route.query.token
 })
 
 const onSubmit = handleSubmit((values) => {
