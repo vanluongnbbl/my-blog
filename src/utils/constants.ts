@@ -14,6 +14,10 @@ export const PATHS = {
   HOME: '/',
   LOGIN: '/login',
   REGISTER: '/register',
+  ABOUT: '/about',
+  CHANGE_PASSWORD: '/change-password',
+  FORGOT_PASSWORD: '/forgot-password',
+  RESET_PASSWORD: '/reset-password',
 }
 
-export const GUEST_ROUTES = ['login', 'register']
+export const GUEST_ROUTES = ['login', 'register', 'forgot-password', 'reset-password']

@@ -115,9 +115,6 @@ class HttpClient {
           authStore.clearAuth()
           throw Error('user inactive')
         }
-
-        console.log('error 333', error)
-
         return Promise.reject(error)
       },
     )

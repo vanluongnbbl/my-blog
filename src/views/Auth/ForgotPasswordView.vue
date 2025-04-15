@@ -6,44 +6,47 @@ import { API_STATUS, PATHS } from '@/utils/constants'
 import { useAlertStore } from '@/stores/useAlertStore'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { registerSchema, type RegisterDTO } from '@/validators/registerSchema'
-import { useRegister } from '@/api/auth/useRegister'
+import { forgotPasswordSchema, type ForgotPasswordDTO } from '@/validators/forgotPasswordSchema'
+import { useForgotPassword } from '@/api/auth/useForgotPassword'
 
 const alertStore = useAlertStore()
 const router = useRouter()
 const { t } = useI18n()
-const { handleSubmit } = useForm<RegisterDTO>({
-  validationSchema: registerSchema,
+const { handleSubmit } = useForm<ForgotPasswordDTO>({
+  validationSchema: forgotPasswordSchema,
 })
-const registerApi = useRegister({
+
+const requestResetPassword = useForgotPassword({
   config: {
     onError: (error) => {
       if (error.response?.status === API_STATUS.BAD_REQUEST) {
         alertStore.openAlertConfig({
           type: 'error',
-          message: error.response?.data.code,
+          message: error.response?.data.message,
+        })
+      }
+
+      if (error.response?.status === API_STATUS.NOT_FOUND) {
+        alertStore.openAlertConfig({
+          type: 'error',
+          message: 'Email not exist!',
         })
       }
     },
     onSuccess: () => {
       alertStore.openAlertConfig({
         type: 'success',
-        message: t('message.success.register'),
+        message: 'Password reset request has been sent.',
       })
-      router.push(PATHS.LOGIN)
     },
   },
 })
 
 const onSubmit = handleSubmit((values) => {
-  registerApi.mutate({
-    username: values.userName,
-    email: values.email,
-    password: values.password,
-  })
+  requestResetPassword.mutate(values)
 })
 
-const isLoading = computed(() => registerApi.isPending.value)
+const isLoading = computed(() => requestResetPassword.isPending.value)
 </script>
 
 <template>
@@ -51,13 +54,10 @@ const isLoading = computed(() => registerApi.isPending.value)
     <el-card style="width: 480px" shadow="always">
       <el-page-header @back="router.push(PATHS.LOGIN)" class="mb-4" />
       <el-form @submit.prevent="onSubmit">
-        <VTextField name="userName" :label="t('auth.userName')" />
         <VTextField name="email" :label="t('auth.email')" />
-        <VTextField name="password" :label="t('auth.password')" type="password" />
-        <VTextField name="confirmPassword" :label="t('auth.confirmPassword')" type="password" />
         <div class="flex justify-end">
           <el-button type="primary" native-type="submit" size="large" :loading="isLoading" :disabled="isLoading">{{
-            t('auth.signUp')
+            t('auth.resetPassword')
           }}</el-button>
         </div>
       </el-form>

@@ -9,25 +9,46 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
+      path: PATHS.HOME,
       name: 'home',
       component: HomeView,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, layout: 'app' },
     },
     {
-      path: '/about',
+      path: PATHS.ABOUT,
       name: 'about',
       component: () => import('../views/AboutView.vue'),
+      meta: { requiresAuth: true, layout: 'app' },
     },
     {
-      path: '/login',
+      path: PATHS.LOGIN,
       name: 'login',
       component: () => import('@/views/Auth/LoginView.vue'),
+      meta: { layout: 'none' },
     },
     {
-      path: '/register',
+      path: PATHS.REGISTER,
       name: 'register',
       component: () => import('@/views/Auth/RegisterView.vue'),
+      meta: { layout: 'none' },
+    },
+    {
+      path: PATHS.FORGOT_PASSWORD,
+      name: 'forgot-password',
+      component: () => import('@/views/Auth/ForgotPasswordView.vue'),
+      meta: { layout: 'none' },
+    },
+    {
+      path: PATHS.RESET_PASSWORD,
+      name: 'reset-password',
+      component: () => import('@/views/Auth/ResetPasswordView.vue'),
+      meta: { layout: 'none' },
+    },
+    {
+      path: PATHS.CHANGE_PASSWORD,
+      name: 'change-password',
+      component: () => import('@/views/Auth/ChangePasswordView.vue'),
+      meta: { layout: 'app' },
     },
   ],
 })

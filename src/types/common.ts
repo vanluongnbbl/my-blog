@@ -9,7 +9,11 @@ type TError = {
 }
 
 export type ResponseError = {
-  error: TError
+  code: string
+  message: string
+  details: {
+    property: string
+  }[]
 }
 
 export type Response<T> = {
