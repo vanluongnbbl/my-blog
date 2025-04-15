@@ -36,14 +36,13 @@ const loginApi = useLogin({
       localStorageServices.setAccessToken(data.data?.accessToken ?? '')
       localStorageServices.setRefreshToken(data.data?.refreshToken ?? '')
       queryClient.removeQueries()
-      userProfile.refetch()
     },
   },
 })
 
 const userProfile = useUserProfile({
   config: {
-    enabled: false,
+    enabled: loginApi.isSuccess,
   },
 })
 

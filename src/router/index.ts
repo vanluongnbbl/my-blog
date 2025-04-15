@@ -42,16 +42,37 @@ router.beforeEach(async (to, from, next) => {
     return next()
   }
 
-  if (!isGuestRoute) {
-    const userProfile = await getUserProfile()
-    if (userProfile?.data?.id) {
-      authStore.setAuth({
-        id: userProfile?.data?.id,
-        username: userProfile?.data?.username,
-        email: userProfile?.data?.email,
-      })
+  if (isGuestRoute && !authStore?.auth?.id) {
+    try {
+      const userProfile = await getUserProfile()
+      if (userProfile?.data?.id) {
+        authStore.setAuth({
+          id: userProfile?.data?.id,
+          username: userProfile?.data?.username,
+          email: userProfile?.data?.email,
+        })
 
-      isAuthenticated = hasToken && !!userProfile?.data?.id
+        return next({ name: 'home' })
+      }
+    } catch (error) {
+      return next()
+    }
+  }
+
+  if (!isGuestRoute) {
+    try {
+      const userProfile = await getUserProfile()
+      if (userProfile?.data?.id) {
+        authStore.setAuth({
+          id: userProfile?.data?.id,
+          username: userProfile?.data?.username,
+          email: userProfile?.data?.email,
+        })
+
+        isAuthenticated = hasToken && !!userProfile?.data?.id
+      }
+    } catch (error) {
+      return next({ name: 'login' })
     }
   }
 

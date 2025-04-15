@@ -10,10 +10,7 @@ import { localStorageServices } from '@/utils/localStorageServices'
 interface HttpClientRequestConfig extends AxiosRequestConfig {
   url: string
 }
-interface RefreshTokenResponse {
-  access_token: string
-  refresh_token: string
-}
+
 type RequestMethods = Extract<Method, 'get' | 'post' | 'put' | 'delete' | 'patch' | 'option' | 'head'>
 type RequestCallback = (token: string) => void
 
@@ -79,7 +76,11 @@ class HttpClient {
         const alertStore = useAlertStore()
         const authStore = useAuthStore()
 
-        if (error?.response?.status === API_STATUS.UNAUTHORIZED) {
+        if (
+          error?.response?.status === API_STATUS.UNAUTHORIZED &&
+          !window.location.pathname.includes(PATHS.LOGIN) &&
+          localStorageServices.getRefreshToken()
+        ) {
           if (!HttpClient.whiteList.some((v) => (config?.url as string).includes(v))) {
             if (!HttpClient.isRefreshing) {
               HttpClient.isRefreshing = true
@@ -89,9 +90,7 @@ class HttpClient {
                 })
                 .catch((error) => {
                   HttpClient.requests = []
-                  if (!window.location.pathname.includes(PATHS.LOGIN)) {
-                    authStore.clearAuth()
-                  }
+                  authStore.clearAuth()
                   return Promise.reject(error)
                 })
                 .finally(() => {
